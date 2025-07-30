@@ -6,11 +6,12 @@ WORKDIR /usr/src/tado-exporter
 
 COPY Cargo.* .
 COPY src/ ./src
-RUN rustup toolchain install stable
 
 
 FROM messense/rust-musl-cross:aarch64-musl AS builder-arm64
 ENV TARGET=aarch64-unknown-linux-musl
+
+RUN apk add --no-cache ca-certificates
 
 WORKDIR /usr/src/tado-exporter
 
@@ -22,7 +23,7 @@ COPY src/ ./src
 FROM builder-$TARGETARCH$TARGETVARIANT as final-builder
 RUN rustup target add ${TARGET}
 RUN cargo build --target ${TARGET} --release --target-dir /build && \
-    cp /build/$TARGET/release/tado-exporter /tado-exporter_$TARGETPLATFORM && \
+    cp /build/$TARGET/release/tado-exporter /tado-exporter_$TARGETARCH$TARGETVARIANT&& \
     rm -rf /build/${TARGET}
 
 FROM --platform=$TARGETPLATFORM alpine:latest
@@ -45,14 +46,10 @@ RUN echo "I'm building on $BUILDOS/$BUILDARCH/$BUILDVARIANT"
 
 RUN echo "builder-$TARGETARCH$TARGETVARIANT"
 
-RUN if [ "$TARGETARCH$TARGETVARIANT" = "armv7" ]; then apk add --upgrade --no-cache patchelf; fi
-
 RUN apk add --upgrade --no-cache wget
 
 COPY --from=final-builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=final-builder /tado-exporter_$TARGETPLATFORM /usr/bin/tado-exporter
-
-RUN if [ "$TARGETARCH$TARGETVARIANT" = "armv7" ]; then patchelf --set-interpreter /lib/ld-linux-armhf.so.3 /tado-exporter; fi
+COPY --from=final-builder /tado-exporter_$TARGETARCH$TARGETVARIANT /usr/bin/tado-exporter
 
 # Create the user
 RUN addgroup -g $USER_GID $USERNAME && adduser -D -H -u $USER_UID -G $USERNAME $USERNAME

@@ -14,9 +14,8 @@ ENV TARGET=x86_64-unknown-linux-musl
 #ENV CARGO_TARGET_X86_64-UNKNOWN-LINUX-MUSL_LINKER=gcc CC_x86_64_unknown_linux_musl=gcc CXX_x86_64_unknown_linux_musl=g++
 
 # Work only on ARM64, NO CROSS COMPILE Tested OSX
-FROM builder as builder-arm64
+FROM messense/rust-musl-cross:aarch64-musl AS builder-arm64
 ENV TARGET=aarch64-unknown-linux-musl
-RUN apk add --upgrade --no-cache gcc
 
 #ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
 

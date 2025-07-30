@@ -1,24 +1,17 @@
-FROM --platform=$BUILDPLATFORM rust:alpine AS builder-amd64
+FROM messense/rust-musl-cross:x86_64-musl AS builder-amd64
 ENV TARGET=x86_64-unknown-linux-musl
-RUN apk add --upgrade --no-cache ca-certificates pkgconfig openssl-dev build-base libffi-dev perl make
-
-WORKDIR /usr/src/tado-exporter
-
-COPY Cargo.* .
-COPY src/ ./src
 
 FROM messense/rust-musl-cross:aarch64-musl AS builder-arm64
 ENV TARGET=aarch64-unknown-linux-musl
 
+FROM builder-$TARGETARCH$TARGETVARIANT as final-builder
 WORKDIR /usr/src/tado-exporter
-
 COPY Cargo.* .
 COPY src/ ./src
 
-FROM builder-$TARGETARCH$TARGETVARIANT as final-builder
 RUN rustup target add ${TARGET}
 RUN cargo build --target ${TARGET} --release --target-dir /build && \
-    cp /build/$TARGET/release/tado-exporter /tado-exporter_$TARGETARCH$TARGETVARIANT&& \
+    cp /build/$TARGET/release/tado-exporter /tado-exporter_${TARGETARCH}${TARGETVARIANT} && \
     rm -rf /build/${TARGET}
 
 FROM --platform=$TARGETPLATFORM alpine:latest
@@ -43,7 +36,7 @@ RUN echo "builder-$TARGETARCH$TARGETVARIANT"
 
 RUN apk add --upgrade --no-cache wget ca-certificates
 
-COPY --from=final-builder /tado-exporter_$TARGETARCH$TARGETVARIANT /usr/bin/tado-exporter
+COPY --from=final-builder /tado-exporter_${TARGETARCH}${TARGETVARIANT} /usr/bin/tado-exporter
 
 # Create the user
 RUN addgroup -g $USER_GID $USERNAME && adduser -D -H -u $USER_UID -G $USERNAME $USERNAME

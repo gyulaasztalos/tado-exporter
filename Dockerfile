@@ -9,7 +9,6 @@ COPY src/ ./src
 
 FROM messense/rust-musl-cross:aarch64-musl AS builder-arm64
 ENV TARGET=aarch64-unknown-linux-musl
-RUN apk add --upgrade --no-cache ca-certificates
 
 WORKDIR /usr/src/tado-exporter
 
@@ -42,9 +41,8 @@ RUN echo "I'm building on $BUILDOS/$BUILDARCH/$BUILDVARIANT"
 
 RUN echo "builder-$TARGETARCH$TARGETVARIANT"
 
-RUN apk add --upgrade --no-cache wget
+RUN apk add --upgrade --no-cache wget ca-certificates
 
-COPY --from=final-builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=final-builder /tado-exporter_$TARGETARCH$TARGETVARIANT /usr/bin/tado-exporter
 
 # Create the user

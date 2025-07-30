@@ -7,12 +7,14 @@ ENV TARGET=aarch64-unknown-linux-musl
 FROM builder-$TARGETARCH$TARGETVARIANT as final-builder
 WORKDIR /usr/src/tado-exporter
 
+ARG TARGETARCH
+
 COPY Cargo.* .
 COPY src/ ./src
 
 RUN rustup target add ${TARGET}
 RUN cargo build --target ${TARGET} --release --target-dir /build && \
-    cp /build/$TARGET/release/tado-exporter /tado-exporter_${TARGET} && \
+    cp /build/$TARGET/release/tado-exporter /tado-exporter_${TARGETARCH} && \
     rm -rf /build/${TARGET}
 
 FROM --platform=$TARGETPLATFORM alpine:latest
@@ -37,7 +39,7 @@ RUN echo "builder-$TARGETARCH$TARGETVARIANT"
 
 RUN apk add --upgrade --no-cache wget ca-certificates
 
-COPY --from=final-builder /tado-exporter_${TARGET} /usr/bin/tado-exporter
+COPY --from=final-builder /tado-exporter_${TARGETARCH} /usr/bin/tado-exporter
 
 # Create the user
 RUN addgroup -g $USER_GID $USERNAME && adduser -D -H -u $USER_UID -G $USERNAME $USERNAME

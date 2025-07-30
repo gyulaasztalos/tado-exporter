@@ -37,7 +37,7 @@ RUN echo "builder-$TARGETARCH$TARGETVARIANT"
 
 RUN apk add --upgrade --no-cache wget ca-certificates
 
-COPY --from=final-builder /tado-exporter_${TARGETARCH}${TARGETVARIANT} /usr/bin/tado-exporter
+COPY --from=final-builder /tado-exporter_${TARGET} /usr/bin/tado-exporter
 
 # Create the user
 RUN addgroup -g $USER_GID $USERNAME && adduser -D -H -u $USER_UID -G $USERNAME $USERNAME

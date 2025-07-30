@@ -35,6 +35,15 @@ jobs:
         if: steps.check-update.outputs.updated == 'true'
         run: cp external_latest_commit last_external_commit
 
+      - name: Commit last commit hash
+        if: steps.check-update.outputs.updated == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add last_external_commit
+          git commit -m "Update last_external_commit for monitoring"
+          git push
+
       - name: Generate date-based tag (YYYYMMDD)
         id: date
         if: steps.check-update.outputs.updated == 'true'

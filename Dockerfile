@@ -1,20 +1,18 @@
 FROM messense/rust-musl-cross:x86_64-musl AS builder-amd64
+ENV TARGET=x86_64-unknown-linux-musl
 
 FROM messense/rust-musl-cross:aarch64-musl AS builder-arm64
+ENV TARGET=aarch64-unknown-linux-musl
 
-FROM builder-$TARGETARCH as final-builder
+FROM builder-$TARGETARCH$TARGETVARIANT as final-builder
 WORKDIR /usr/src/tado-exporter
-
-ARG TARGETARCH
-ARG TARGETVARIANT
-ENV TARGET=${TARGETARCH}${TARGETVARIANT:+-${TARGETVARIANT}}-unknown-linux-musl
 
 COPY Cargo.* .
 COPY src/ ./src
 
 RUN rustup target add ${TARGET}
 RUN cargo build --target ${TARGET} --release --target-dir /build && \
-    cp /build/$TARGET/release/tado-exporter /tado-exporter_${TARGETARCH}${TARGETVARIANT} && \
+    cp /build/$TARGET/release/tado-exporter /tado-exporter_${TARGET} && \
     rm -rf /build/${TARGET}
 
 FROM --platform=$TARGETPLATFORM alpine:latest

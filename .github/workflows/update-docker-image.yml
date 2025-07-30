@@ -1,5 +1,8 @@
 name: Build and Push External Repo Docker Image
 
+permissions:
+  contents: write
+
 on:
   schedule:
     - cron: '0 2 * * *'

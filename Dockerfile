@@ -1,11 +1,14 @@
 FROM messense/rust-musl-cross:x86_64-musl AS builder-amd64
-ENV TARGET=x86_64-unknown-linux-musl
 
 FROM messense/rust-musl-cross:aarch64-musl AS builder-arm64
-ENV TARGET=aarch64-unknown-linux-musl
 
-FROM builder-$TARGETARCH$TARGETVARIANT as final-builder
+FROM builder-$TARGETARCH as final-builder
 WORKDIR /usr/src/tado-exporter
+
+ARG TARGETARCH
+ARG TARGETVARIANT
+ENV TARGET=${TARGETARCH}${TARGETVARIANT:+-${TARGETVARIANT}}-unknown-linux-musl
+
 COPY Cargo.* .
 COPY src/ ./src
 

@@ -19,17 +19,11 @@ ENV TARGET=aarch64-unknown-linux-musl
 
 #ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
 
-FROM builder as builder-armv7
-ENV TARGET=armv7-unknown-linux-gnueabihf
-RUN apk add --upgrade --no-cache libc6-dev-armhf-cross gcc-arm-linux-gnueabihf
-
-ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc CC_armv7_unknown_Linux_gnueabihf=arm-linux-gnueabihf-gcc CXX_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-g++
-
 FROM builder-$TARGETARCH$TARGETVARIANT as final-builder
 RUN rustup target add ${TARGET}
 RUN cargo build --target ${TARGET} --release --target-dir /build && \
-    cp /build/$TARGET/release/tado-exporter / && \
-    rm -rf /build
+    cp /build/$TARGET/release/tado-exporter /tado-exporter_$TARGETPLATFORM && \
+    rm -rf /build/${TARGET}
 
 FROM --platform=$TARGETPLATFORM alpine:latest
 LABEL name="tado-exporter"
@@ -56,7 +50,7 @@ RUN if [ "$TARGETARCH$TARGETVARIANT" = "armv7" ]; then apk add --upgrade --no-ca
 RUN apk add --upgrade --no-cache wget
 
 COPY --from=final-builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=final-builder /tado-exporter /usr/bin/
+COPY --from=final-builder /tado-exporter_$TARGETPLATFORM /usr/bin/tado-exporter
 
 RUN if [ "$TARGETARCH$TARGETVARIANT" = "armv7" ]; then patchelf --set-interpreter /lib/ld-linux-armhf.so.3 /tado-exporter; fi
 

@@ -7,18 +7,14 @@ WORKDIR /usr/src/tado-exporter
 COPY Cargo.* .
 COPY src/ ./src
 
-
 FROM messense/rust-musl-cross:aarch64-musl AS builder-arm64
 ENV TARGET=aarch64-unknown-linux-musl
-
-RUN apk add --no-cache ca-certificates
+RUN apk add --upgrade --no-cache ca-certificates
 
 WORKDIR /usr/src/tado-exporter
 
 COPY Cargo.* .
 COPY src/ ./src
-
-#ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
 
 FROM builder-$TARGETARCH$TARGETVARIANT as final-builder
 RUN rustup target add ${TARGET}

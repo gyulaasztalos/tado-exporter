@@ -3,3 +3,5 @@ Daily running GitHub Actions workflow which creates docker image of the latest s
 
 Using custom Dockerfile with alpine base image and non-root user.
 Only x86_64 and ARM64 are supported.
+
+The image is available on DockerHub: https://hub.docker.com/r/asztalosgyula/tado-exporter

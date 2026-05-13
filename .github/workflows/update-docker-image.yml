@@ -47,7 +47,7 @@ jobs:
           git commit -m "Update last_external_commit for monitoring"
           git push
 
-      - name: Generate date-based tag (YYYYMMDD)
+      - name: Generate date-based tag (YYYY.MM.DD)
         id: date
         if: steps.check-update.outputs.updated == 'true'
         run: echo "today=$(date -u +%Y.%m.%d)" >> $GITHUB_OUTPUT

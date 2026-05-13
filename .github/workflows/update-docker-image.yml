@@ -50,7 +50,7 @@ jobs:
       - name: Generate date-based tag (YYYYMMDD)
         id: date
         if: steps.check-update.outputs.updated == 'true'
-        run: echo "today=$(date -u +%Y%m%d)" >> $GITHUB_OUTPUT
+        run: echo "today=$(date -u +%Y.%m.%d)" >> $GITHUB_OUTPUT
 
       - name: Load secret
         id: op-load-secret
@@ -90,4 +90,4 @@ jobs:
           push: true
           tags: |
             asztalosgyula/tado-exporter:latest
-            asztalosgyula/tado-exporter:${{ steps.date.outputs.today }}
+            asztalosgyula/tado-exporter:v${{ steps.date.outputs.today }}

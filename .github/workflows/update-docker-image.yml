@@ -92,7 +92,7 @@ jobs:
 
       - name: Build and Push (multi-arch)
         if: steps.check-update.outputs.updated == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./external-repo
           platforms: linux/amd64,linux/arm64

@@ -77,14 +77,14 @@ jobs:
 
       - name: Log in to DockerHub
         if: steps.check-update.outputs.updated == 'true'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: asztalosgyula
           password: ${{ steps.op-load-secret.outputs.DOCKERHUB_TOKEN }}
 
       - name: Log in to GHCR
         if: steps.check-update.outputs.updated == 'true'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}

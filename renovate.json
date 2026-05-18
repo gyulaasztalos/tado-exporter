@@ -11,6 +11,15 @@
   "timezone": "Europe/Budapest",
   "packageRules": [
     {
+      "matchCategories": [
+        "docker"
+      ],
+      "enabled": true,
+      "managerFilePatterns": [
+        "/Dockerfile$/"
+      ]
+    },
+    {
       "matchUpdateTypes": [
         "minor",
         "patch",
@@ -20,16 +29,9 @@
       "automerge": true
     },
     {
-      "matchDepTypes": [
-        "devDependencies"
-      ],
+      "matchDepTypes": ["devDependencies"],
       "automerge": true
     }
   ],
-  "platformAutomerge": true,
-  "docker": {
-    "enabled": true,
-    "fileMatch": [
-      "Dockerfile$"    ]
-  }
+  "platformAutomerge": true
 }

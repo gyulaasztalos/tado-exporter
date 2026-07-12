@@ -15,7 +15,7 @@
         "docker"
       ],
       "enabled": true,
-      "managerFilePatterns": [
+      "matchFileNames": [
         "/Dockerfile$/"
       ]
     },
